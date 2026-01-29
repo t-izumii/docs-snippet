@@ -9,7 +9,7 @@
       "mode": "react",
       "code": {
         "html": "// 共通props\ninterface BaseProps {\n  label: string;\n  className?: string;\n}\n\n// buttonタグ用のprops\ninterface ButtonProps extends BaseProps {\n  href?: never;\n  target?: never;\n  rel?: never;\n  disabled?: boolean;\n  type?: \"button\" | \"submit\" | \"reset\";\n}\n\n// aタグ用のprops\ninterface AnchorProps extends BaseProps {\n  href: string;\n  target?: \"_blank\" | \"_self\" | \"_parent\" | \"_top\";\n  rel?: string;\n  disabled?: never;\n  type?: never;\n}\n\ntype Props = ButtonProps | AnchorProps;\n\nfunction Button({ label, href, className, ...rest }: Props) {\n  const classes = `c-button ${className ?? \"\"}`;\n\n  if (href) {\n    return <a href={href} className={classes} {...rest}>{label}</a>;\n  }\n\n  return <button className={classes} {...rest}>{label}</button>;\n}\n\nexport default function Demo() {\n  return (\n    <>\n      <Button label=\"Click me\" />\n      <Button label=\"Click me\" href=\"/about\" target=\"_blank\" />\n    </>\n  );\n}",
-        "css": ".c-button {\n  padding: 1rem;\n  display: inline-block;\n  font-size: 1rem;\n  font-family: Arial, Helvetica, sans-serif;\n  color: #000;\n  line-height: 1;\n  text-decoration: none;\n  box-shadow: none;\n  background: #fff;\n  border: 1px solid #000;\n}",
+        "css": ".c-button {\n  padding: 1rem;\n  display: inline-block;\n  font-size: 1rem;\n  font-family: Arial, Helvetica, sans-serif;\n  line-height: 1;\n  color: #000;\n  background: #fff;\n  border: 1px solid #000;\n  box-shadow: none;\n  text-decoration: none;\n}",
         "typescript": ""
       },
       "styleType": "scss",
@@ -19,7 +19,7 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-01-29T03:11:29.065Z",
-      "updatedAt": "2026-01-29T09:20:15.727Z"
+      "updatedAt": "2026-01-29T09:29:53.144Z"
     }
   ],
   "folders": [
