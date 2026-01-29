@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "snippets": [
+    {
+      "id": "4e8d24ff-227b-44d4-8d76-a21ca76712fa",
+      "title": "button",
+      "description": "",
+      "folderId": "06759897-146b-486e-975f-8947326918eb",
+      "mode": "react",
+      "code": {
+        "html": "// 共通props\ninterface BaseProps {\n  label: string;\n  className?: string;\n}\n\n// buttonタグ用のprops\ninterface ButtonProps extends BaseProps {\n  href?: never;\n  target?: never;\n  rel?: never;\n  disabled?: boolean;\n  type?: \"button\" | \"submit\" | \"reset\";\n}\n\n// aタグ用のprops\ninterface AnchorProps extends BaseProps {\n  href: string;\n  target?: \"_blank\" | \"_self\" | \"_parent\" | \"_top\";\n  rel?: string;\n  disabled?: never;\n  type?: never;\n}\n\ntype Props = ButtonProps | AnchorProps;\n\nfunction Button({ label, href, className, ...rest }: Props) {\n  const classes = `c-button ${className ?? \"\"}`;\n\n  if (href) {\n    return <a href={href} className={classes} {...rest}>{label}</a>;\n  }\n\n  return <button className={classes} {...rest}>{label}</button>;\n}\n\nexport default function Demo() {\n  return (\n    <>\n      <Button label=\"Click me\" />\n      <Button label=\"Click me\" href=\"/about\" target=\"_blank\" />\n    </>\n  );\n}",
+        "css": ".c-button {\n  padding: 1rem;\n  display: inline-block;\n  font-size: 1rem;\n  font-family: Arial, Helvetica, sans-serif;\n  color: #000;\n  line-height: 1;\n  text-decoration: none;\n  box-shadow: none;\n  background: #fff;\n  border: 1px solid #000;\n}",
+        "typescript": ""
+      },
+      "styleType": "scss",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-01-29T03:11:29.065Z",
+      "updatedAt": "2026-01-29T09:20:15.727Z"
+    }
+  ],
+  "folders": [
+    {
+      "id": "65fcc31a-b1ba-4900-b49b-0c81e81b7321",
+      "name": "react",
+      "parentId": null,
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 0,
+      "createdAt": "2026-01-29T03:18:52.651Z"
+    },
+    {
+      "id": "06759897-146b-486e-975f-8947326918eb",
+      "name": "ui",
+      "parentId": "65fcc31a-b1ba-4900-b49b-0c81e81b7321",
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 0,
+      "createdAt": "2026-01-29T03:18:57.810Z"
+    },
+    {
+      "id": "391f405d-ea13-42db-b593-e0962a72cbcc",
+      "name": "components",
+      "parentId": "65fcc31a-b1ba-4900-b49b-0c81e81b7321",
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 1,
+      "createdAt": "2026-01-29T03:19:11.710Z"
+    },
+    {
+      "id": "24cc0159-0efe-4735-8e76-bb85d622953d",
+      "name": "layouyt",
+      "parentId": "65fcc31a-b1ba-4900-b49b-0c81e81b7321",
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 2,
+      "createdAt": "2026-01-29T03:19:19.611Z"
+    }
+  ],
+  "cdnPresets": [
+    {
+      "id": "gsap",
+      "name": "GSAP",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.0/gsap.min.js",
+      "type": "js",
+      "category": "animation"
+    },
+    {
+      "id": "three",
+      "name": "Three.js",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+      "type": "js",
+      "category": "3d"
+    },
+    {
+      "id": "axios",
+      "name": "Axios",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js",
+      "type": "js",
+      "category": "utility"
+    }
+  ]
+}

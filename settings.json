@@ -1,0 +1,23 @@
+{
+  "editor": {
+    "fontSize": 14,
+    "theme": "vs-dark",
+    "tabSize": 2,
+    "wordWrap": "on",
+    "minimap": false,
+    "autoSave": true,
+    "autoSaveDelay": 1000
+  },
+  "preview": {
+    "defaultDevice": "desktop",
+    "autoReload": false,
+    "showConsole": true,
+    "baseCssPreset": "reset",
+    "customBaseCss": "a { color: red;}"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "singleQuote": true,
+    "semi": true
+  }
+}
