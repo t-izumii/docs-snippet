@@ -20,6 +20,26 @@
       "usageCount": 0,
       "createdAt": "2026-01-29T03:11:29.065Z",
       "updatedAt": "2026-01-29T09:29:53.144Z"
+    },
+    {
+      "id": "ab1d42c8-7e50-453c-b302-6ec0111f2d1c",
+      "title": "modal",
+      "description": "",
+      "folderId": "391f405d-ea13-42db-b593-e0962a72cbcc",
+      "mode": "react",
+      "code": {
+        "html": "interface Props {\n  children?: unknown;\n  id: string;\n}\n\nfunction Modal({ children, id }: Props) {\n  return (\n    <dialog className=\"c-modal js-modal\" id={id}>\n    <div className=\"c-modal__container js-modalContainer\">\n      <button \n        className=\"c-modal__close js-modalClose\" \n        type=\"button\"\n        aria-label=\"閉じる\"\n      >\n        ×\n      </button>\n      <div className=\"c-modal__inner\">\n        {children}\n      </div>\n    </div>\n\n    </dialog>\n  );\n}\n\nexport default function Demo() {\n  return (\n    <>\n      <button type=\"button\" data-modal-target=\"test\">モーダルを開く</button>\n      <Modal id=\"test\">\n        test\n      </Modal>   \n    </>\n  );\n}",
+        "css": ".c-modal__container {\n  width: calc(100vw - 4rem);\n  height: calc(100vh - 4rem);\n  position: relative;\n}\n\n.c-modal__close {\n  position: absolute;\n  top: 1rem;\n  right: 1rem;\n  cursor: pointer;\n}",
+        "typescript": "// Events\n// Eventsの実装は必要に応じて実装してください。\nconst Events = {\n  OPEN_MODAL: \"open_modal\",\n  CLOSE_MODAL: \"close_modal\",\n} as const;\n\n// EventEmitter\ntype EventCallback = (payload?: any) => void;\n\nclass EventEmitterClass {\n  _events: Map<string, Set<EventCallback>> = new Map();\n\n  on(event: string, callback: EventCallback) {\n    if (!this._events.has(event)) {\n      this._events.set(event, new Set());\n    }\n    this._events.get(event)!.add(callback);\n  }\n\n  off(event: string, callback: EventCallback) {\n    this._events.get(event)?.delete(callback);\n  }\n\n  emit(event: string, payload?: any) {\n    this._events.get(event)?.forEach((callback) => callback(payload));\n  }\n}\nconst EventEmitter = new EventEmitterClass();\n\n\n/**\n * モーダルダイアログを管理するクラス\n * @description dialog要素を使用したアクセシブルなモーダルを提供\n */\nclass Modal {\n  /** dialog要素 */\n  _dialog: HTMLDialogElement;\n  /** 閉じるボタン要素 */\n  _closeButton: HTMLElement | null;\n  /** モーダルが閉じた後に実行されるコールバック */\n  _onCloseCallback?: () => void;\n\n  /**\n   * @param element - 対象のdialog要素\n   */\n  constructor(element: HTMLDialogElement) {\n    this._dialog = element;\n    this._closeButton = element.querySelector(\".js-modalClose\");\n\n    this._init();\n  }\n\n  /**\n   * イベントリスナーを初期化\n   */\n  private _init() {\n    this._handleOpen = this._handleOpen.bind(this);\n    this._handleBackdropClick = this._handleBackdropClick.bind(this);\n    this._handleDialogClose = this._handleDialogClose.bind(this);\n\n    EventEmitter.on(Events.OPEN_MODAL, this._handleOpen);\n    this._closeButton?.addEventListener(\"click\", () => this.close());\n    this._dialog.addEventListener(\"click\", this._handleBackdropClick);\n    this._dialog.addEventListener(\"close\", this._handleDialogClose);\n  }\n\n  /**\n   * モーダルを開く\n   * @param payload - イベントペイロード\n   * @param payload.id - 対象モーダルのid\n   * @param payload.onClose - 閉じた後に実行されるコールバック\n   */\n  private _handleOpen(payload: { id: string; onClose?: () => void }) {\n    if (this._dialog.id !== payload.id) return;\n\n    this._onCloseCallback = payload.onClose;\n    document.body.classList.add(\"is-modalOpen\");\n    this._dialog.showModal();\n  }\n\n  /**\n   * 背景クリック時の処理\n   * @param e - マウスイベント\n   */\n  private _handleBackdropClick(e: MouseEvent) {\n    if (e.target === this._dialog) {\n      this._dialog.close();\n    }\n  }\n\n  /**\n   * モーダルが閉じた後の処理\n   */\n  private _handleDialogClose() {\n    document.body.classList.remove(\"is-modalOpen\");\n    this._onCloseCallback?.();\n    this._onCloseCallback = undefined;\n  }\n\n  /**\n   * モーダルを閉じる\n   */\n  private close() {\n    this._dialog.close();\n  }\n\n  /**\n   * イベントリスナーを解除しインスタンスを破棄\n   */\n  destroy() {\n    EventEmitter.off(Events.OPEN_MODAL, this._handleOpen);\n    this._closeButton?.removeEventListener(\"click\", this.close);\n    this._dialog.removeEventListener(\"click\", this._handleBackdropClick);\n    this._dialog.removeEventListener(\"close\", this._handleDialogClose);\n  }\n}\n\n// 初期化\n// 必要に応じて初期化する。\ndocument.querySelectorAll<HTMLDialogElement>(\".js-modal\").forEach((el) => {\n  new Modal(el);\n});\n\ndocument.querySelectorAll<HTMLElement>(\"[data-modal-target]\").forEach((trigger) => {\n  trigger.addEventListener(\"click\", () => {\n    const targetId = trigger.dataset.modalTarget;\n    if (targetId) {\n      EventEmitter.emit(Events.OPEN_MODAL, { id: targetId });\n    }\n  });\n});"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-01-29T09:33:02.120Z",
+      "updatedAt": "2026-01-29T10:34:32.628Z"
     }
   ],
   "folders": [
