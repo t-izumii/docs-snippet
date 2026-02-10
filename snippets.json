@@ -82,26 +82,6 @@
       "updatedAt": "2026-01-30T02:39:00.152Z"
     },
     {
-      "id": "287b9c3c-1bb7-420e-986f-4ffcb2afce64",
-      "title": "tooltip",
-      "description": "",
-      "folderId": "06759897-146b-486e-975f-8947326918eb",
-      "mode": "react",
-      "code": {
-        "html": "interface Props {\n  children?: unknown;\n  content: string;\n  position?: \"top\" | \"bottom\" | \"left\" | \"right\";\n}\n\nfunction Tooltip({ children, content, position = \"top\" }: Props) {\n  return (\n    <span className=\"c-tooltip js-tooltip\" data-tooltip-position={position}>\n      <span className=\"c-tooltip__trigger\">{children}</span>\n      <span className=\"c-tooltip__content\" role=\"tooltip\">{content}</span>\n    </span>\n  );\n}\n\nexport default function Demo() {\n  return (\n    <div style={{ padding: \"100px\", display: \"flex\", gap: \"24px\" }}>\n      <Tooltip content=\"上に表示\" position=\"top\">\n        <button type=\"button\">Top</button>\n      </Tooltip>\n      <Tooltip content=\"下に表示\" position=\"bottom\">\n        <button type=\"button\">Bottom</button>\n      </Tooltip>\n      <Tooltip content=\"左に表示\" position=\"left\">\n        <button type=\"button\">Left</button>\n      </Tooltip>\n      <Tooltip content=\"右に表示\" position=\"right\">\n        <button type=\"button\">Right</button>\n      </Tooltip>\n    </div>\n  );\n}",
-        "css": ".c-tooltip {\n  position: relative;\n  display: inline-block;\n}\n\n.c-tooltip__trigger {\n  display: inline-block;\n}\n\n.c-tooltip__content {\n  position: absolute;\n  z-index: 1000;\n  padding: 0.5rem ;\n  background: #333;\n  color: #fff;\n  font-size: 1rem;\n  border-radius: 0.25rem;\n  white-space: nowrap;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 0.2s, visibility 0.2s;\n  pointer-events: none;\n}\n\n/* 位置：上 */\n.c-tooltip[data-tooltip-position=\"top\"] .c-tooltip__content {\n  bottom: 100%;\n  left: 50%;\n  transform: translateX(-50%);\n  margin-bottom: 0.5rem;\n}\n\n/* 位置：下 */\n.c-tooltip[data-tooltip-position=\"bottom\"] .c-tooltip__content {\n  top: 100%;\n  left: 50%;\n  transform: translateX(-50%);\n  margin-top: 0.5rem;\n}\n\n/* 位置：左 */\n.c-tooltip[data-tooltip-position=\"left\"] .c-tooltip__content {\n  right: 100%;\n  top: 50%;\n  transform: translateY(-50%);\n  margin-right: 0.5rem;\n}\n\n/* 位置：右 */\n.c-tooltip[data-tooltip-position=\"right\"] .c-tooltip__content {\n  left: 100%;\n  top: 50%;\n  transform: translateY(-50%);\n  margin-left: 0.5rem;\n}\n\n/* 表示状態 */\n.c-tooltip.is-visible .c-tooltip__content {\n  opacity: 1;\n  visibility: visible;\n}",
-        "typescript": "/**\n * ツールチップを管理するクラス\n * @description 位置自動調整、遅延表示に対応したツールチップを提供\n */\nclass Tooltip {\n  _container: HTMLElement;\n  _trigger: HTMLElement | null;\n  _content: HTMLElement | null;\n  _position: string;\n  _showTimeout: number | null;\n  _hideTimeout: number | null;\n  _showDelay: number;\n  _hideDelay: number;\n\n  constructor(element: HTMLElement, options: { showDelay?: number; hideDelay?: number } = {}) {\n    this._container = element;\n    this._trigger = element.querySelector(\".c-tooltip__trigger\");\n    this._content = element.querySelector(\".c-tooltip__content\");\n    this._position = element.dataset.tooltipPosition || \"top\";\n    this._showTimeout = null;\n    this._hideTimeout = null;\n    this._showDelay = options.showDelay ?? 200;\n    this._hideDelay = options.hideDelay ?? 100;\n\n    this._init();\n  }\n\n  private _init() {\n    this._handleMouseEnter = this._handleMouseEnter.bind(this);\n    this._handleMouseLeave = this._handleMouseLeave.bind(this);\n    this._handleFocus = this._handleFocus.bind(this);\n    this._handleBlur = this._handleBlur.bind(this);\n\n    this._trigger?.addEventListener(\"mouseenter\", this._handleMouseEnter);\n    this._trigger?.addEventListener(\"mouseleave\", this._handleMouseLeave);\n    this._trigger?.addEventListener(\"focus\", this._handleFocus, true);\n    this._trigger?.addEventListener(\"blur\", this._handleBlur, true);\n  }\n\n  private _handleMouseEnter() {\n    this._clearTimeouts();\n    this._showTimeout = window.setTimeout(() => this._show(), this._showDelay);\n  }\n\n  private _handleMouseLeave() {\n    this._clearTimeouts();\n    this._hideTimeout = window.setTimeout(() => this._hide(), this._hideDelay);\n  }\n\n  private _handleFocus() {\n    this._clearTimeouts();\n    this._show();\n  }\n\n  private _handleBlur() {\n    this._clearTimeouts();\n    this._hide();\n  }\n\n  private _clearTimeouts() {\n    if (this._showTimeout) {\n      clearTimeout(this._showTimeout);\n      this._showTimeout = null;\n    }\n    if (this._hideTimeout) {\n      clearTimeout(this._hideTimeout);\n      this._hideTimeout = null;\n    }\n  }\n\n  private _show() {\n    this._adjustPosition();\n    this._container.classList.add(\"is-visible\");\n  }\n\n  private _hide() {\n    this._container.classList.remove(\"is-visible\");\n  }\n\n  private _adjustPosition() {\n    if (!this._content) return;\n\n    const rect = this._content.getBoundingClientRect();\n    const viewportWidth = window.innerWidth;\n    const viewportHeight = window.innerHeight;\n\n    let newPosition = this._position;\n\n    // 画面端での位置自動調整\n    if (this._position === \"top\" && rect.top < 0) {\n      newPosition = \"bottom\";\n    } else if (this._position === \"bottom\" && rect.bottom > viewportHeight) {\n      newPosition = \"top\";\n    } else if (this._position === \"left\" && rect.left < 0) {\n      newPosition = \"right\";\n    } else if (this._position === \"right\" && rect.right > viewportWidth) {\n      newPosition = \"left\";\n    }\n\n    if (newPosition !== this._position) {\n      this._container.dataset.tooltipPosition = newPosition;\n    }\n  }\n\n  destroy() {\n    this._clearTimeouts();\n    this._trigger?.removeEventListener(\"mouseenter\", this._handleMouseEnter);\n    this._trigger?.removeEventListener(\"mouseleave\", this._handleMouseLeave);\n    this._trigger?.removeEventListener(\"focus\", this._handleFocus, true);\n    this._trigger?.removeEventListener(\"blur\", this._handleBlur, true);\n  }\n}\n\n// 初期化\ndocument.querySelectorAll<HTMLElement>(\".js-tooltip\").forEach((el) => {\n  new Tooltip(el);\n});"
-      },
-      "styleType": "scss",
-      "scriptType": "typescript",
-      "cdnLinks": [],
-      "tags": [],
-      "isFavorite": false,
-      "usageCount": 0,
-      "createdAt": "2026-01-30T01:56:45.946Z",
-      "updatedAt": "2026-01-30T02:03:09.218Z"
-    },
-    {
       "id": "0d02e235-377a-4b4f-99c8-5461c13bd456",
       "title": "carousel",
       "description": "",
@@ -133,6 +113,206 @@
       "usageCount": 0,
       "createdAt": "2026-01-30T02:43:22.988Z",
       "updatedAt": "2026-01-30T03:17:55.218Z"
+    },
+    {
+      "id": "5d92b770-7013-402b-8d01-02ad40f8d5d1",
+      "title": "picture",
+      "description": "",
+      "folderId": "06759897-146b-486e-975f-8947326918eb",
+      "mode": "react",
+      "code": {
+        "html": "interface Props {\n  src: string;\n  srcSp?: string;\n  alt: string;\n  width: number;\n  widthSp?: number;\n  height: number;\n  heightSp?: number;\n  className?: string;\n  fetchpriority?: \"high\" | \"low\" | \"auto\";\n  loading?: \"lazy\" | \"eager\";\n}\n\nfunction Picture({\n  src,\n  srcSp,\n  alt,\n  width,\n  widthSp,\n  height,\n  heightSp,\n  className,\n  fetchpriority,\n  loading,\n}: Props) {\n\n  const baseUrl = \"\";\n  const resolvePath = (path: string) =>\n    path.startsWith(\"http\") ? path : `${baseUrl}${path}`;\n\n  return (\n    <picture\n      className={`c-picture ${className || \"\"}`}\n      style={{\n        \"--width\": width,\n        \"--width-sp\": widthSp,\n        \"--height\": height,\n        \"--height-sp\": heightSp,\n      } as preact.CSSProperties}\n    >\n      {srcSp && <source srcSet={resolvePath(srcSp)} width={widthSp ?? width} height={heightSp ?? height} media=\"(max-width: 767px)\" />}\n      <img\n        src={resolvePath(src)}\n        alt={alt}\n        width={width}\n        height={height}\n        fetchpriority={fetchpriority ?? \"auto\"}\n        loading={loading ?? \"lazy\"}\n      />\n    </picture>\n  );\n}\n\nexport default function Demo() {\n  return (\n    <>\n      <Picture src=\"https://placehold.jp/400x400.png\" alt=\"\" width={400} height={400} />\n    </>\n  );\n}",
+        "css": ".c-picture {\n  img {\n    display: inline-block;\n    width: calc(var(--width) * 1px);\n    height: auto;\n\n    @media (max-width: 767px) {\n      width: calc(var(--width-sp, var(--width)) * 1px);\n      height: auto;\n    }\n  }\n}",
+        "typescript": ""
+      },
+      "styleType": "scss",
+      "scriptType": "javascript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-01-30T09:45:07.189Z",
+      "updatedAt": "2026-01-30T10:05:27.144Z"
+    },
+    {
+      "id": "ba127375-de49-40a6-b428-29579afe58f8",
+      "title": "index",
+      "description": "",
+      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "import * as THREE from \"three\";\nimport { OrbitControls } from \"three/examples/jsm/controls/OrbitControls.js\";\nimport { Camera } from \"./Camera.js\";\nimport { Light } from \"./Light.js\";\n\nexport class WebGLApp {\n  canvas: HTMLCanvasElement;\n  scene: THREE.Scene;\n  renderer: THREE.WebGLRenderer;\n  camera: Camera;\n  light: Light;\n  controls: OrbitControls | null;\n  updateCallbacks: (() => void)[];\n\n  constructor(selector) {\n    // コンテナを取得\n    const container = document.querySelector(selector);\n    if (!container) {\n      throw new Error(`Container not found: ${selector}`);\n    }\n\n    // canvasを生成してコンテナに追加\n    this.canvas = document.createElement(\"canvas\");\n    container.appendChild(this.canvas);\n\n    this.scene = new THREE.Scene();\n    this.renderer = new THREE.WebGLRenderer({\n      canvas: this.canvas,\n      antialias: true,\n    });\n    this.camera = new Camera();\n    this.light = new Light(this.scene);\n    this.controls = null;\n    this.updateCallbacks = [];\n\n    this.init();\n    this.setupEventListeners();\n    this.animate();\n  }\n\n  init() {\n    // シーンの背景色\n    this.scene.background = new THREE.Color(0x1a3a4a);\n\n    // レンダラーの設定\n    this.renderer.setSize(window.innerWidth, window.innerHeight);\n    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n  }\n\n  // sceneのgetterを追加\n  getScene() {\n    return this.scene;\n  }\n\n  // カメラのgetterを追加\n  getCamera() {\n    return this.camera;\n  }\n\n  // rendererのgetterを追加\n  getRenderer() {\n    return this.renderer;\n  }\n\n  // lightのgetterを追加\n  getLight() {\n    return this.light;\n  }\n\n  // オブジェクトを追加するメソッド\n  addObject(object) {\n    this.scene.add(object);\n  }\n\n  // オブジェクトを削除するメソッド\n  removeObject(object) {\n    this.scene.remove(object);\n  }\n\n  // アニメーションループに更新処理を追加するメソッド\n  addUpdateCallback(callback) {\n    this.updateCallbacks.push(callback);\n  }\n\n  // OrbitControlsを有効化するメソッド\n  enableOrbitControls(options = {}) {\n    if (!this.controls) {\n      this.controls = new OrbitControls(this.camera.instance!, this.canvas);\n    }\n    return this.controls;\n  }\n\n  // OrbitControlsを取得するメソッド\n  getControls() {\n    return this.controls;\n  }\n\n  setupEventListeners() {\n    window.addEventListener(\"resize\", () => this.onResize());\n  }\n\n  onResize() {\n    // カメラのアスペクト比を更新\n    this.camera.resize();\n\n    // レンダラーのサイズを更新\n    this.renderer.setSize(window.innerWidth, window.innerHeight);\n    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n  }\n\n  animate = () => {\n    requestAnimationFrame(this.animate);\n\n    // カメラの更新\n    this.camera.update();\n\n    // ライトの更新\n    this.light.update();\n\n    // 登録された更新処理を実行\n    this.updateCallbacks.forEach((callback) => callback());\n\n    // レンダリング\n    this.renderer.render(this.scene, this.camera.instance!);\n  };\n}\n"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-02T05:14:35.461Z",
+      "updatedAt": "2026-02-02T05:15:11.495Z"
+    },
+    {
+      "id": "cf59ee8e-96a6-4cd2-bd4c-1832bc8ddd0a",
+      "title": "camera",
+      "description": "",
+      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "import * as THREE from \"three\";\n\nexport class Camera {\n  instance: THREE.PerspectiveCamera | null;\n\n  constructor() {\n    this.instance = null;\n    this.init();\n  }\n\n  init() {\n    const fov = 60;\n    const fovRad = (fov / 2) * (Math.PI / 180);\n    const distance = window.innerHeight / 2 / Math.tan(fovRad);\n\n    this.instance = new THREE.PerspectiveCamera(\n      fov,\n      window.innerWidth / window.innerHeight,\n      0.1,\n      10000,\n    );\n\n    this.instance!.position.z = distance;\n  }\n\n  resize() {\n    this.instance!.aspect = window.innerWidth / window.innerHeight;\n    this.instance!.updateProjectionMatrix();\n  }\n\n  update() {}\n}\n"
+      },
+      "styleType": "css",
+      "scriptType": "javascript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-02T05:15:14.227Z",
+      "updatedAt": "2026-02-02T05:15:30.390Z"
+    },
+    {
+      "id": "0cec09c6-7eea-4529-a88d-340435c29aef",
+      "title": "light",
+      "description": "",
+      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "import * as THREE from \"three\";\n\nexport class Light {\n  ambientLight: THREE.AmbientLight | null;\n  directionalLight: THREE.DirectionalLight | null;\n  scene: THREE.Scene | null;\n\n  constructor(scene: THREE.Scene) {\n    this.scene = scene;\n    this.ambientLight = null;\n    this.directionalLight = null;\n    this.init();\n  }\n\n  init() {\n    // 環境光\n    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);\n    this.scene!.add(this.ambientLight);\n\n    // 平行光源\n    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);\n    this.directionalLight.position.set(1, 1, 1);\n    this.scene!.add(this.directionalLight);\n  }\n\n  update() {}\n}\n"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-02T05:15:47.854Z",
+      "updatedAt": "2026-02-02T05:15:59.033Z"
+    },
+    {
+      "id": "264df1ef-efe4-4faf-a7b8-1ba02daa1b20",
+      "title": "grayScale",
+      "description": "",
+      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "/**\n* @description 色の輝度（明るさ）を計算 (0.0 ~ 1.0)グレースケール時などに使用\n* @param {vec3} \n* @return {number} 対象pxの輝度\n*/\n`float getLuminance(vec3 color) {\n  return dot(color, vec3(0.299, 0.587, 0.114));\n}`\n\n/**\n* @description エッジ検出（Sobelフィルタ）\n* @param {sampler2D, uv, texelSize} \n* @return {number} 対象pxのエッジ強度\n*/\n\n// エッジ検出（Sobelフィルタ）\n// Sobelカーネル（X方向：縦のエッジを検出）\n`const mat3 sobelX = mat3(\n  -1.0, 0.0, 1.0,\n  -2.0, 0.0, 2.0,\n  -1.0, 0.0, 1.0\n);`\n\n// Sobelカーネル（Y方向：横のエッジを検出）\n`const mat3 sobelY = mat3(\n  -1.0, -2.0, -1.0,\n  0.0,  0.0,  0.0,\n  1.0,  2.0,  1.0\n);`\n\n// Sobelフィルタを適用してエッジを検出\n// 戻り値: エッジの強度 (0.0 = エッジなし, 1.0 = 強いエッジ)\n`float sobel(sampler2D tex, vec2 uv, vec2 texelSize) {\n  float gx = 0.0;  // X方向の勾配\n  float gy = 0.0;  // Y方向の勾配\n\n  // 3x3の範囲でカーネルを適用\n  for (int i = -1; i <= 1; i++) {\n    for (int j = -1; j <= 1; j++) {\n      vec2 offset = vec2(float(i), float(j)) * texelSize;\n      float lum = getLuminance(texture2D(tex, uv + offset).rgb);\n      gx += lum * sobelX[i + 1][j + 1];\n      gy += lum * sobelY[i + 1][j + 1];\n    }\n  }\n\n  // 勾配の大きさを計算（ピタゴラスの定理）\n  return sqrt(gx * gx + gy * gy);\n}`"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-06T09:44:28.652Z",
+      "updatedAt": "2026-02-10T05:49:15.197Z"
+    },
+    {
+      "id": "9359a00d-7e01-48cf-96c5-e1ca78737749",
+      "title": "distMask",
+      "description": "",
+      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "/**\n* @description 画面中心からの距離計算\n*/\n`float aspect = uResolution.x / uResolution.y;\nvec2 centeredUv = vUv - vec2(0.5, 0.5);\ncenteredUv.x *= aspect;\nfloat dist = length(centeredUv);`"
+      },
+      "styleType": "css",
+      "scriptType": "javascript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-10T05:47:30.371Z",
+      "updatedAt": "2026-02-10T05:59:01.298Z"
+    },
+    {
+      "id": "863eaf30-3465-42b1-bd8d-5a9970235a09",
+      "title": "coverUV",
+      "description": "",
+      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "/**\n* @description 画像がcanvas全体を覆うように、拡大/縮小(background-size: coverと同じ効果)\n* @param {uv, resolution, imageResolution} \n* @return {uv} 画像サイズで補正されたUV座標\n*/\n`\n// 画像アスペクト比を取得する\nvec2 imageResolution = vec2(textureSize(uTexture, 0));\n\nvec2 getCoverUv(vec2 uv, vec2 resolution, vec2 imageResolution) {\n  vec2 ratio = vec2(\n    min((resolution.x / resolution.y) / (imageResolution.x / imageResolution.y), 1.0),\n    min((resolution.y / resolution.x) / (imageResolution.y / imageResolution.x), 1.0)\n  );\n  return uv * ratio + (1.0 - ratio) * 0.5;\n}`"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-10T05:48:39.390Z",
+      "updatedAt": "2026-02-10T05:52:43.819Z"
+    },
+    {
+      "id": "cf3dcce8-3c7e-43f5-8bce-1ddeba70f48c",
+      "title": "pixelNoize",
+      "description": "",
+      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "/**\n* @description pixelNoizeを生成する\n*/\n`float noiseScale = 6.0;\nvec2 pixelatedUv = floor(vUv * uResolution / noiseScale) * noiseScale / uResolution;`"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-10T06:09:23.338Z",
+      "updatedAt": "2026-02-10T06:11:09.746Z"
+    },
+    {
+      "id": "2f5f0fa9-1b2d-44c2-8a67-7c04d6efffcf",
+      "title": "fbm",
+      "description": "",
+      "folderId": "8d1903b0-6a0c-496e-9e7d-00ca46e7c71a",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "// フラクショナルブラウニアンモーション: 複数オクターブのノイズを重ねる\n// より自然で複雑なノイズパターンを生成\n`float fbm(vec2 p) {\n  float value = 0.0;\n  float amplitude = 0.5;\n  float frequency = 1.0;\n\n  for (int i = 0; i < 5; i++) {\n    value += amplitude * noise(p * frequency);\n    amplitude *= 0.5;   // 振幅を半分に\n    frequency *= 2.0;   // 周波数を2倍に\n  }\n\n  return value;\n}`"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-10T06:11:27.881Z",
+      "updatedAt": "2026-02-10T06:12:00.751Z"
+    },
+    {
+      "id": "c21fd40c-4c33-4b86-9904-4c03f6e78ab4",
+      "title": "perin",
+      "description": "",
+      "folderId": "8d1903b0-6a0c-496e-9e7d-00ca46e7c71a",
+      "mode": "standard",
+      "code": {
+        "html": "",
+        "css": "",
+        "typescript": "// パーリンノイズ: 滑らかなランダムパターン\n`float hash(vec2 p) {\n  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  f = f * f * (3.0 - 2.0 * f);\n\n  float a = hash(i);\n  float b = hash(i + vec2(1.0, 0.0));\n  float c = hash(i + vec2(0.0, 1.0));\n  float d = hash(i + vec2(1.0, 1.0));\n\n  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n}`\n"
+      },
+      "styleType": "css",
+      "scriptType": "typescript",
+      "cdnLinks": [],
+      "tags": [],
+      "isFavorite": false,
+      "usageCount": 0,
+      "createdAt": "2026-02-10T06:12:13.926Z",
+      "updatedAt": "2026-02-10T06:13:19.497Z"
     }
   ],
   "folders": [
@@ -171,6 +351,33 @@
       "icon": "folder",
       "order": 2,
       "createdAt": "2026-01-29T03:19:19.611Z"
+    },
+    {
+      "id": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
+      "name": "webgl",
+      "parentId": null,
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 1,
+      "createdAt": "2026-02-02T05:14:31.978Z"
+    },
+    {
+      "id": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "name": "glsl",
+      "parentId": null,
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 2,
+      "createdAt": "2026-02-06T09:44:25.986Z"
+    },
+    {
+      "id": "8d1903b0-6a0c-496e-9e7d-00ca46e7c71a",
+      "name": "noise",
+      "parentId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 0,
+      "createdAt": "2026-02-10T06:11:19.478Z"
     }
   ],
   "cdnPresets": [
