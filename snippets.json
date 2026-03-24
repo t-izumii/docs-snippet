@@ -135,66 +135,6 @@
       "updatedAt": "2026-03-19T05:13:45.672Z"
     },
     {
-      "id": "ba127375-de49-40a6-b428-29579afe58f8",
-      "title": "index",
-      "description": "",
-      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
-      "mode": "standard",
-      "code": {
-        "html": "",
-        "css": "",
-        "typescript": "import * as THREE from \"three\";\nimport { OrbitControls } from \"three/examples/jsm/controls/OrbitControls.js\";\nimport { Camera } from \"./Camera.js\";\nimport { Light } from \"./Light.js\";\n\nexport class WebGLApp {\n  canvas: HTMLCanvasElement;\n  scene: THREE.Scene;\n  renderer: THREE.WebGLRenderer;\n  camera: Camera;\n  light: Light;\n  controls: OrbitControls | null;\n  updateCallbacks: (() => void)[];\n\n  constructor(selector) {\n    // コンテナを取得\n    const container = document.querySelector(selector);\n    if (!container) {\n      throw new Error(`Container not found: ${selector}`);\n    }\n\n    // canvasを生成してコンテナに追加\n    this.canvas = document.createElement(\"canvas\");\n    container.appendChild(this.canvas);\n\n    this.scene = new THREE.Scene();\n    this.renderer = new THREE.WebGLRenderer({\n      canvas: this.canvas,\n      antialias: true,\n    });\n    this.camera = new Camera();\n    this.light = new Light(this.scene);\n    this.controls = null;\n    this.updateCallbacks = [];\n\n    this.init();\n    this.setupEventListeners();\n    this.animate();\n  }\n\n  init() {\n    // シーンの背景色\n    this.scene.background = new THREE.Color(0x1a3a4a);\n\n    // レンダラーの設定\n    this.renderer.setSize(window.innerWidth, window.innerHeight);\n    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n  }\n\n  // sceneのgetterを追加\n  getScene() {\n    return this.scene;\n  }\n\n  // カメラのgetterを追加\n  getCamera() {\n    return this.camera;\n  }\n\n  // rendererのgetterを追加\n  getRenderer() {\n    return this.renderer;\n  }\n\n  // lightのgetterを追加\n  getLight() {\n    return this.light;\n  }\n\n  // オブジェクトを追加するメソッド\n  addObject(object) {\n    this.scene.add(object);\n  }\n\n  // オブジェクトを削除するメソッド\n  removeObject(object) {\n    this.scene.remove(object);\n  }\n\n  // アニメーションループに更新処理を追加するメソッド\n  addUpdateCallback(callback) {\n    this.updateCallbacks.push(callback);\n  }\n\n  // OrbitControlsを有効化するメソッド\n  enableOrbitControls(options = {}) {\n    if (!this.controls) {\n      this.controls = new OrbitControls(this.camera.instance!, this.canvas);\n    }\n    return this.controls;\n  }\n\n  // OrbitControlsを取得するメソッド\n  getControls() {\n    return this.controls;\n  }\n\n  setupEventListeners() {\n    window.addEventListener(\"resize\", () => this.onResize());\n  }\n\n  onResize() {\n    // カメラのアスペクト比を更新\n    this.camera.resize();\n\n    // レンダラーのサイズを更新\n    this.renderer.setSize(window.innerWidth, window.innerHeight);\n    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n  }\n\n  animate = () => {\n    requestAnimationFrame(this.animate);\n\n    // カメラの更新\n    this.camera.update();\n\n    // ライトの更新\n    this.light.update();\n\n    // 登録された更新処理を実行\n    this.updateCallbacks.forEach((callback) => callback());\n\n    // レンダリング\n    this.renderer.render(this.scene, this.camera.instance!);\n  };\n}\n"
-      },
-      "styleType": "css",
-      "scriptType": "typescript",
-      "cdnLinks": [],
-      "tags": [],
-      "isFavorite": false,
-      "usageCount": 0,
-      "createdAt": "2026-02-02T05:14:35.461Z",
-      "updatedAt": "2026-02-02T05:15:11.495Z"
-    },
-    {
-      "id": "cf59ee8e-96a6-4cd2-bd4c-1832bc8ddd0a",
-      "title": "camera",
-      "description": "",
-      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
-      "mode": "standard",
-      "code": {
-        "html": "",
-        "css": "",
-        "typescript": "import * as THREE from \"three\";\n\nexport class Camera {\n  instance: THREE.PerspectiveCamera | null;\n\n  constructor() {\n    this.instance = null;\n    this.init();\n  }\n\n  init() {\n    const fov = 60;\n    const fovRad = (fov / 2) * (Math.PI / 180);\n    const distance = window.innerHeight / 2 / Math.tan(fovRad);\n\n    this.instance = new THREE.PerspectiveCamera(\n      fov,\n      window.innerWidth / window.innerHeight,\n      0.1,\n      10000,\n    );\n\n    this.instance!.position.z = distance;\n  }\n\n  resize() {\n    this.instance!.aspect = window.innerWidth / window.innerHeight;\n    this.instance!.updateProjectionMatrix();\n  }\n\n  update() {}\n}\n"
-      },
-      "styleType": "css",
-      "scriptType": "javascript",
-      "cdnLinks": [],
-      "tags": [],
-      "isFavorite": false,
-      "usageCount": 0,
-      "createdAt": "2026-02-02T05:15:14.227Z",
-      "updatedAt": "2026-02-02T05:15:30.390Z"
-    },
-    {
-      "id": "0cec09c6-7eea-4529-a88d-340435c29aef",
-      "title": "light",
-      "description": "",
-      "folderId": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
-      "mode": "standard",
-      "code": {
-        "html": "",
-        "css": "",
-        "typescript": "import * as THREE from \"three\";\n\nexport class Light {\n  ambientLight: THREE.AmbientLight | null;\n  directionalLight: THREE.DirectionalLight | null;\n  scene: THREE.Scene | null;\n\n  constructor(scene: THREE.Scene) {\n    this.scene = scene;\n    this.ambientLight = null;\n    this.directionalLight = null;\n    this.init();\n  }\n\n  init() {\n    // 環境光\n    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);\n    this.scene!.add(this.ambientLight);\n\n    // 平行光源\n    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);\n    this.directionalLight.position.set(1, 1, 1);\n    this.scene!.add(this.directionalLight);\n  }\n\n  update() {}\n}\n"
-      },
-      "styleType": "css",
-      "scriptType": "typescript",
-      "cdnLinks": [],
-      "tags": [],
-      "isFavorite": false,
-      "usageCount": 0,
-      "createdAt": "2026-02-02T05:15:47.854Z",
-      "updatedAt": "2026-02-02T05:15:59.033Z"
-    },
-    {
       "id": "264df1ef-efe4-4faf-a7b8-1ba02daa1b20",
       "title": "grayScale",
       "description": "",
@@ -217,15 +157,15 @@
     },
     {
       "id": "9359a00d-7e01-48cf-96c5-e1ca78737749",
-      "title": "distMask",
+      "title": "distCircleMask",
       "description": "",
-      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "folderId": "fe50a26f-658a-4ac9-83b7-0cb371746b36",
       "mode": "glsl",
       "code": {
         "html": "",
         "css": "",
         "typescript": "",
-        "glsl": "/**\n* @description 画面中心からの距離計算\n*/\n`float aspect = uResolution.x / uResolution.y;\nvec2 centeredUv = vUv - vec2(0.5, 0.5);\ncenteredUv.x *= aspect;\nfloat dist = length(centeredUv);`"
+        "glsl": "uniform float uTime;\nuniform vec2 uResolution;\nvarying vec2 vUv;\n\nvoid main() {\n  float aspect = uResolution.x / uResolution.y;\n  vec2 centeredUv = vUv - vec2(0.5);\n\n  // 横長ならxを伸ばす、縦長ならyを伸ばす\n  if (aspect >= 1.0) {\n    centeredUv.x *= aspect;\n  } else {\n    centeredUv.y /= aspect;\n  }\n\n  float dist = length(centeredUv);\n  gl_FragColor = vec4(vec3(dist), 1.0);\n}"
       },
       "styleType": "css",
       "scriptType": "javascript",
@@ -234,13 +174,13 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-02-10T05:47:30.371Z",
-      "updatedAt": "2026-03-24T01:18:15.484Z"
+      "updatedAt": "2026-03-24T03:14:28.624Z"
     },
     {
       "id": "863eaf30-3465-42b1-bd8d-5a9970235a09",
       "title": "coverUV",
       "description": "",
-      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "folderId": "fe50a26f-658a-4ac9-83b7-0cb371746b36",
       "mode": "glsl",
       "code": {
         "html": "/**\n* @description 画像がcanvas全体を覆うように、拡大/縮小(background-size: coverと同じ効果)\n* @param {uv, resolution, imageResolution} \n* @return {uv} 画像サイズで補正されたUV座標\n*/\n`\n// 画像アスペクト比を取得する\nvec2 imageResolution = vec2(textureSize(uTexture, 0));\n\nvec2 getCoverUv(vec2 uv, vec2 resolution, vec2 imageResolution) {\n  vec2 ratio = vec2(\n    min((resolution.x / resolution.y) / (imageResolution.x / imageResolution.y), 1.0),\n    min((resolution.y / resolution.x) / (imageResolution.y / imageResolution.x), 1.0)\n  );\n  return uv * ratio + (1.0 - ratio) * 0.5;\n}`",
@@ -259,15 +199,15 @@
     },
     {
       "id": "cf3dcce8-3c7e-43f5-8bce-1ddeba70f48c",
-      "title": "pixelNoize",
+      "title": "pixelGrid",
       "description": "",
-      "folderId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "folderId": "fe50a26f-658a-4ac9-83b7-0cb371746b36",
       "mode": "glsl",
       "code": {
         "html": "/**\n* @description pixelNoizeを生成する\n*/\n`float noiseScale = 6.0;\nvec2 pixelatedUv = floor(vUv * uResolution / noiseScale) * noiseScale / uResolution;`",
         "css": "",
         "typescript": "",
-        "glsl": "/**\n* @description pixelNoizeを生成する\n*/\n`float noiseScale = 6.0;\nvec2 pixelatedUv = floor(vUv * uResolution / noiseScale) * noiseScale / uResolution;`"
+        "glsl": "uniform float uTime;\nuniform vec2 uResolution;\nvarying vec2 vUv;\n\nvoid main() {\n  float noiseScale = 100.0;\n  vec2 pixelatedUv = floor(vUv * uResolution / noiseScale) * noiseScale / uResolution;\n  gl_FragColor = vec4(pixelatedUv.x, pixelatedUv.y, 0.0, 1.0);\n}"
       },
       "styleType": "css",
       "scriptType": "typescript",
@@ -276,7 +216,7 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-02-10T06:09:23.338Z",
-      "updatedAt": "2026-03-24T01:19:05.955Z"
+      "updatedAt": "2026-03-24T03:14:45.995Z"
     },
     {
       "id": "2f5f0fa9-1b2d-44c2-8a67-7c04d6efffcf",
@@ -288,7 +228,7 @@
         "html": "uniform float uTime;\nuniform float uResolution;\nvarying vec2 vUv;\n\nvoid main() {\n  gl_FragColor = vec4(vUv.x, vUv.y, uTime, 1.0);\n}",
         "css": "",
         "typescript": "",
-        "glsl": "uniform float uTime;\nuniform float uResolution;\nvarying vec2 vUv;\n\nfloat hash(vec2 p) {\n  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  f = f * f * (3.0 - 2.0 * f);\n\n  float a = hash(i);\n  float b = hash(i + vec2(1.0, 0.0));\n  float c = hash(i + vec2(0.0, 1.0));\n  float d = hash(i + vec2(1.0, 1.0));\n\n  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n}\n\n\n\nfloat fbm(vec2 p) {\n  float value = 0.0;\n  float amplitude = 0.5;\n  float frequency = 1.0;\n\n  for (int i = 0; i < 5; i++) {\n    value += amplitude * noise(p * frequency);\n    amplitude *= 0.5;   // 振幅を半分に\n    frequency *= 2.0;   // 周波数を2倍に\n  }\n\n  return value;\n}\n\nvoid main() {\n  gl_FragColor = vec4(fbm(vUv), fbm(vUv), fbm(vUv), 1.0);\n}"
+        "glsl": "uniform float uTime;\nuniform vec2 uResolution;\nvarying vec2 vUv;\n\nfloat hash(vec2 p) {\n  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  f = f * f * (3.0 - 2.0 * f);\n\n  float a = hash(i);\n  float b = hash(i + vec2(1.0, 0.0));\n  float c = hash(i + vec2(0.0, 1.0));\n  float d = hash(i + vec2(1.0, 1.0));\n\n  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n}\n\nfloat fbm(vec2 p) {\n  float value = 0.0;\n  float amplitude = 0.5;\n  float frequency = 1.0;\n\n  for (int i = 0; i < 5; i++) {\n    value += amplitude * noise(p * frequency);\n    amplitude *= 0.5;   // 振幅を半分に\n    frequency *= 2.0;   // 周波数を2倍に\n  }\n\n  return value;\n}\n\nvoid main() {\n  float n = fbm(vUv);\n  gl_FragColor = vec4(vec3(n), 1.0);\n}"
       },
       "styleType": "css",
       "scriptType": "typescript",
@@ -297,7 +237,7 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-02-10T06:11:27.881Z",
-      "updatedAt": "2026-03-24T01:06:14.884Z"
+      "updatedAt": "2026-03-24T04:28:38.551Z"
     },
     {
       "id": "c21fd40c-4c33-4b86-9904-4c03f6e78ab4",
@@ -309,7 +249,7 @@
         "html": "",
         "css": "",
         "typescript": "",
-        "glsl": "uniform float uTime;\nuniform float uResolution;\nvarying vec2 vUv;\n\nfloat hash(vec2 p) {\n  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  f = f * f * (3.0 - 2.0 * f);\n\n  float a = hash(i);\n  float b = hash(i + vec2(1.0, 0.0));\n  float c = hash(i + vec2(0.0, 1.0));\n  float d = hash(i + vec2(1.0, 1.0));\n\n  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n}\n\nvoid main() {\n  float n = noise(vUv * 10.0 + uTime);                                                                                                gl_FragColor = vec4(n, n, n, 1.0);  \n}"
+        "glsl": "uniform float uTime;\nuniform vec2 uResolution;\nvarying vec2 vUv;\n\nfloat hash(vec2 p) {\n  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  f = f * f * (3.0 - 2.0 * f);\n\n  float a = hash(i);\n  float b = hash(i + vec2(1.0, 0.0));\n  float c = hash(i + vec2(0.0, 1.0));\n  float d = hash(i + vec2(1.0, 1.0));\n\n  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);\n}\n\nvoid main() {\n  float n = noise(vUv * 10.0 + uTime);                                                                                                gl_FragColor = vec4(n, n, n, 1.0);  \n}"
       },
       "styleType": "css",
       "scriptType": "typescript",
@@ -318,7 +258,7 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-02-10T06:12:13.926Z",
-      "updatedAt": "2026-03-24T01:11:28.350Z"
+      "updatedAt": "2026-03-24T03:01:42.389Z"
     },
     {
       "id": "e98f0afe-270a-4759-a585-8f2335973a66",
@@ -330,7 +270,7 @@
         "html": "",
         "css": "",
         "typescript": "// simplexノイズ\n`vec4 permute(vec4 x) {\n  return mod(((x * 34.0) + 1.0) * x, 289.0);\n}\n\nvec4 taylorInvSqrt(vec4 r) {\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v) {\n  const vec2 C = vec2(1.0/6.0, 1.0/3.0);\n  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);\n\n  vec3 i  = floor(v + dot(v, C.yyy));\n  vec3 x0 = v - i + dot(i, C.xxx);\n\n  vec3 g  = step(x0.yzx, x0.xyz);\n  vec3 l  = 1.0 - g;\n  vec3 i1 = min(g.xyz, l.zxy);\n  vec3 i2 = max(g.xyz, l.zxy);\n\n  vec3 x1 = x0 - i1 + 1.0 * C.xxx;\n  vec3 x2 = x0 - i2 + 2.0 * C.xxx;\n  vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;\n\n  i = mod(i, 289.0);\n  vec4 p = permute(\n    permute(\n      permute(i.z + vec4(0.0, i1.z, i2.z, 1.0))\n      + i.y + vec4(0.0, i1.y, i2.y, 1.0)\n    ) + i.x + vec4(0.0, i1.x, i2.x, 1.0)\n  );\n\n  float n_ = 1.0 / 7.0;\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j  = p - 49.0 * floor(p * ns.z * ns.z);\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_);\n\n  vec4 x = x_ * ns.x + ns.yyyy;\n  vec4 y = y_ * ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4(x.xy, y.xy);\n  vec4 b1 = vec4(x.zw, y.zw);\n  vec4 s0 = floor(b0) * 2.0 + 1.0;\n  vec4 s1 = floor(b1) * 2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;\n  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;\n\n  vec3 p0 = vec3(a0.xy, h.x);\n  vec3 p1 = vec3(a0.zw, h.y);\n  vec3 p2 = vec3(a1.xy, h.z);\n  vec3 p3 = vec3(a1.zw, h.w);\n\n  vec4 norm = taylorInvSqrt(\n    vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3))\n  );\n  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;\n\n  vec4 m = max(\n    0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)),\n    0.0\n  );\n  m = m * m;\n\n  return 42.0 * dot(m * m,\n    vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3))\n  );\n}`",
-        "glsl": "uniform float uTime;\nuniform float uResolution;\nvarying vec2 vUv;\n\n// simplexノイズ\nvec4 permute(vec4 x) {\n  return mod(((x * 34.0) + 1.0) * x, 289.0);\n}\n\nvec4 taylorInvSqrt(vec4 r) {\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v) {\n  const vec2 C = vec2(1.0/6.0, 1.0/3.0);\n  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);\n\n  vec3 i  = floor(v + dot(v, C.yyy));\n  vec3 x0 = v - i + dot(i, C.xxx);\n\n  vec3 g  = step(x0.yzx, x0.xyz);\n  vec3 l  = 1.0 - g;\n  vec3 i1 = min(g.xyz, l.zxy);\n  vec3 i2 = max(g.xyz, l.zxy);\n\n  vec3 x1 = x0 - i1 + 1.0 * C.xxx;\n  vec3 x2 = x0 - i2 + 2.0 * C.xxx;\n  vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;\n\n  i = mod(i, 289.0);\n  vec4 p = permute(\n    permute(\n      permute(i.z + vec4(0.0, i1.z, i2.z, 1.0))\n      + i.y + vec4(0.0, i1.y, i2.y, 1.0)\n    ) + i.x + vec4(0.0, i1.x, i2.x, 1.0)\n  );\n\n  float n_ = 1.0 / 7.0;\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j  = p - 49.0 * floor(p * ns.z * ns.z);\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_);\n\n  vec4 x = x_ * ns.x + ns.yyyy;\n  vec4 y = y_ * ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4(x.xy, y.xy);\n  vec4 b1 = vec4(x.zw, y.zw);\n  vec4 s0 = floor(b0) * 2.0 + 1.0;\n  vec4 s1 = floor(b1) * 2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;\n  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;\n\n  vec3 p0 = vec3(a0.xy, h.x);\n  vec3 p1 = vec3(a0.zw, h.y);\n  vec3 p2 = vec3(a1.xy, h.z);\n  vec3 p3 = vec3(a1.zw, h.w);\n\n  vec4 norm = taylorInvSqrt(\n    vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3))\n  );\n  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;\n\n  vec4 m = max(\n    0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)),\n    0.0\n  );\n  m = m * m;\n\n  return 42.0 * dot(m * m,\n    vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3))\n  );\n}\n\nvoid main() {\n  float n = snoise(vec3(vUv * 5.0, uTime));                                                                                                                                           \n  // -1.0〜1.0を0.0〜1.0に正規化                                                                                                                                 \n  n = n * 0.5 + 0.5;                                                                                                                                                                  \n  gl_FragColor = vec4(vec3(n), 1.0);      \n}"
+        "glsl": "uniform float uTime;\nuniform vec2 uResolution;\nvarying vec2 vUv;\n\n// simplexノイズ\nvec4 permute(vec4 x) {\n  return mod(((x * 34.0) + 1.0) * x, 289.0);\n}\n\nvec4 taylorInvSqrt(vec4 r) {\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v) {\n  const vec2 C = vec2(1.0/6.0, 1.0/3.0);\n  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);\n\n  vec3 i  = floor(v + dot(v, C.yyy));\n  vec3 x0 = v - i + dot(i, C.xxx);\n\n  vec3 g  = step(x0.yzx, x0.xyz);\n  vec3 l  = 1.0 - g;\n  vec3 i1 = min(g.xyz, l.zxy);\n  vec3 i2 = max(g.xyz, l.zxy);\n\n  vec3 x1 = x0 - i1 + 1.0 * C.xxx;\n  vec3 x2 = x0 - i2 + 2.0 * C.xxx;\n  vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;\n\n  i = mod(i, 289.0);\n  vec4 p = permute(\n    permute(\n      permute(i.z + vec4(0.0, i1.z, i2.z, 1.0))\n      + i.y + vec4(0.0, i1.y, i2.y, 1.0)\n    ) + i.x + vec4(0.0, i1.x, i2.x, 1.0)\n  );\n\n  float n_ = 1.0 / 7.0;\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j  = p - 49.0 * floor(p * ns.z * ns.z);\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_);\n\n  vec4 x = x_ * ns.x + ns.yyyy;\n  vec4 y = y_ * ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4(x.xy, y.xy);\n  vec4 b1 = vec4(x.zw, y.zw);\n  vec4 s0 = floor(b0) * 2.0 + 1.0;\n  vec4 s1 = floor(b1) * 2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;\n  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;\n\n  vec3 p0 = vec3(a0.xy, h.x);\n  vec3 p1 = vec3(a0.zw, h.y);\n  vec3 p2 = vec3(a1.xy, h.z);\n  vec3 p3 = vec3(a1.zw, h.w);\n\n  vec4 norm = taylorInvSqrt(\n    vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3))\n  );\n  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;\n\n  vec4 m = max(\n    0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)),\n    0.0\n  );\n  m = m * m;\n\n  return 42.0 * dot(m * m,\n    vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3))\n  );\n}\n\nvoid main() {\n  float n = snoise(vec3(vUv * 5.0, uTime));                                                                                                                                           \n  // -1.0〜1.0を0.0〜1.0に正規化                                                                                                                                 \n  n = n * 0.5 + 0.5;                                                                                                                                                                  \n  gl_FragColor = vec4(vec3(n), 1.0);      \n}"
       },
       "styleType": "css",
       "scriptType": "typescript",
@@ -339,7 +279,7 @@
       "isFavorite": false,
       "usageCount": 0,
       "createdAt": "2026-03-19T06:28:52.700Z",
-      "updatedAt": "2026-03-24T01:18:30.189Z"
+      "updatedAt": "2026-03-24T03:01:45.746Z"
     }
   ],
   "folders": [
@@ -380,15 +320,6 @@
       "createdAt": "2026-01-29T03:19:19.611Z"
     },
     {
-      "id": "87fe4853-ae5e-4ded-8081-a6ea0152d177",
-      "name": "webgl",
-      "parentId": null,
-      "color": "#3B82F6",
-      "icon": "folder",
-      "order": 1,
-      "createdAt": "2026-02-02T05:14:31.978Z"
-    },
-    {
       "id": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
       "name": "glsl",
       "parentId": null,
@@ -403,8 +334,17 @@
       "parentId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
       "color": "#3B82F6",
       "icon": "folder",
-      "order": 0,
+      "order": 1,
       "createdAt": "2026-02-10T06:11:19.478Z"
+    },
+    {
+      "id": "fe50a26f-658a-4ac9-83b7-0cb371746b36",
+      "name": "uv",
+      "parentId": "0e3c6df7-c349-4f86-a5fe-ed432c52a6ab",
+      "color": "#3B82F6",
+      "icon": "folder",
+      "order": 0,
+      "createdAt": "2026-03-24T03:09:31.404Z"
     }
   ],
   "cdnPresets": [
